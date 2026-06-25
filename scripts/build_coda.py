@@ -68,11 +68,25 @@ def clean_formula(inner):
         result = f'SUBSTITUTE({result},"{long}","{short}")'
     return f'TRIM({result})'
 
-def raw_text_formula(n):
-    """Formula for helper col J: prefix + space + cleaned lower tekstbron."""
+def raw_text_formula_61(n):
+    """Helper col J for section 6.1: only show when E{n} (grootboek) filled."""
     tb = tekstbron(n)
     cleaned = clean_formula(f'LOWER({tb})')
-    return f'=IFERROR($K$1&" "&{cleaned},"")'
+    return (
+        f'=IF({IG_NAME}!E{n}>0,'
+        f'IFERROR($K$1&" "&{cleaned},""),'
+        f'"")'
+    )
+
+def raw_text_formula_62(n):
+    """Helper col J for section 6.2: only show when J{n} filled and J{n}<>2999999."""
+    tb = tekstbron(n)
+    cleaned = clean_formula(f'LOWER({tb})')
+    return (
+        f'=IF(AND({IG_NAME}!J{n}>0,{IG_NAME}!J{n}<>2999999),'
+        f'IFERROR($K$1&" "&{cleaned},""),'
+        f'"")'
+    )
 
 def E_omschrijving_formula(coda_row):
     """Word-boundary truncation at 36 chars, referencing J{coda_row}."""
@@ -168,8 +182,8 @@ def main():
             )
             # D: leeg
             ws.cell(row=coda_row, column=4).value = None
-            # J: helper raw text
-            ws.cell(row=coda_row, column=10).value = raw_text_formula(n)
+            # J: helper raw text (alleen tonen als rij gevuld)
+            ws.cell(row=coda_row, column=10).value = raw_text_formula_61(n)
             # E: omschrijving (word-boundary truncation)
             ws.cell(row=coda_row, column=5).value = E_omschrijving_formula(coda_row)
             # F-I: bedragen
@@ -200,8 +214,8 @@ def main():
             )
             # D: leeg
             ws.cell(row=coda_row, column=4).value = None
-            # J: helper raw text
-            ws.cell(row=coda_row, column=10).value = raw_text_formula(n)
+            # J: helper raw text (alleen tonen als rij gevuld)
+            ws.cell(row=coda_row, column=10).value = raw_text_formula_62(n)
             # E: omschrijving
             ws.cell(row=coda_row, column=5).value = E_omschrijving_formula(coda_row)
             # F-I: bedragen
